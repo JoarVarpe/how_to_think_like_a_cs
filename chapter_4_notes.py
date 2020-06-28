@@ -46,6 +46,27 @@ def final_amount(p, r, n, t):
     return a
 
 
-to_invest = float(input("How much do you want to invest?"))
-fnl = final_amount(to_invest, 0.10, 12, 5)
-print("At the end of the period you'll have", fnl)
+# to_invest = float(input("How much do you want to invest?"))
+# fnl = final_amount(to_invest, 0.10, 12, 5)
+# print("At the end of the period you'll have", fnl)
+
+def all_odd(xs: list) -> bool:
+    """Return True if the entire list of integers consists of odd numbers"""
+    count = 0
+    for value in xs:
+        if value % 2 == 1:
+            count += 1
+    return count == len(xs)
+
+
+def at_least_three_odd(xs: list) -> bool:
+    count = 0
+    for value in xs:
+        if value % 2 == 1:
+            count += 1
+        if count >= 3:
+            return True
+    return False
+
+
+
