@@ -160,8 +160,25 @@ def find_url(target: str) -> str:
 def find_crocodiles(target: str) -> str:
     return target[target.find("<") + len("<"): target.find(">")]
 
-# 1
+
+# 1 tuples can be entered into functions.
+the_tuple = ('hi', 'I', 'am', 'a', 'tuple')
+
+
 def test_of_tuples_as_arg_in_func(tuple) -> None:
-    
+    for i in tuple:
+        print(i)
+
+
+# 2 is a pair a generalization of a tuple, or is a tuple a generalization of a pair?
+# a tuple is a generalization of a pair
+# 3 is a pair a kind of tuple, or is a tuple a kind of pair?
+# a pair is an example of a tuple
+
+# 1
+def make_string_into_alphabetical_table(string: str) -> None:
+    pass
 # 2
 # 3
+# 4
+
