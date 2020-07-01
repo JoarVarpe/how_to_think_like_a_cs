@@ -1,4 +1,5 @@
 import string
+import pprint
 
 # 1
 # print("apple" > "pineapple") == False
@@ -176,9 +177,73 @@ def test_of_tuples_as_arg_in_func(tuple) -> None:
 # a pair is an example of a tuple
 
 # 1
+data = "ThiS is String with Upper and lower case Letters"
+
+
 def make_string_into_alphabetical_table(string: str) -> None:
-    pass
+    letter_count = {}
+    fixed_string = string.lower().split(" ")
+    fixed_string = "".join(fixed_string)
+    for letter in fixed_string:
+        letter_count[letter] = letter_count.get(letter, 0) + 1
+    list_of_count = list(letter_count.items())
+    list_of_count.sort()
+    dict_of_count = dict(list_of_count)
+    for i in range(len(list_of_count)):
+        print(list_of_count[i][0], list_of_count[i][1])
+    # pprint.pprint(dict_of_count)
+
+
 # 2
-# 3
-# 4
+def add_fruit(inventory: dict, fruit: str, quantity=0) -> None:
+    inventory[fruit] = inventory.get(fruit, 0) + quantity
+    return None
+
+
+# new_inventory = {}
+# add_fruit(new_inventory, "strawberry", 10)
+# print(new_inventory)
+# print("strawberry" in new_inventory)
+# print(new_inventory["strawberry"] == 10)
+# add_fruit(new_inventory, "strawberry", 25)
+# print(new_inventory["strawberry"] == 35)
+
+
+# 3 and # 4
+def alice_words():
+    dict_of_words = {}
+    with open("alice_in_wonderland.txt", "r") as fp:
+        phrase_sans_punct = ""
+        for line in fp:
+            for letter in line:
+                if letter == "-":
+                    phrase_sans_punct += letter
+                if letter == "—":
+                    phrase_sans_punct += "-"
+                if letter in string.printable and letter not in string.punctuation:
+
+                    phrase_sans_punct += letter
+
+        list_of_words = phrase_sans_punct.lower().split()
+        string_of_letters = "".join(phrase_sans_punct.lower())
+        for word in list_of_words:
+            dict_of_words[word] = dict_of_words.get(word, 0) + 1
+        list_dict_of_words = list(dict_of_words.items())
+        list_dict_of_words.sort()
+        print("Word{:>21}".format("Count"))
+        print("{0:=>25}".format(""))
+        for stat in range(len(list_dict_of_words)):
+            formatting = "{0}{1:>" + str(25 - len(list_dict_of_words[stat][0])) + "}"
+            print(formatting.format(list_dict_of_words[stat][0], list_dict_of_words[stat][1]))
+        print(list_dict_of_words)
+        longest_word = ""
+        for word in list_of_words:
+            if len(word) > len(longest_word):
+                print("old word {}".format(longest_word))
+                longest_word = word
+                print("new word {}".format(longest_word))
+        print("The longest word is: {}".format(longest_word))
+
+
+alice_words()
 
