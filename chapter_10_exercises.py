@@ -1,4 +1,4 @@
-import turtle, math
+import turtle, math, sys, os
 
 window = turtle.Screen()
 abra = turtle.Turtle()
@@ -149,6 +149,63 @@ def color_sierpinski(tortoise: turtle.Turtle(), order: int, size: float,
         sierpinski(tortoise, order, size)
 
 
+def recursive_min(nested_list: list) -> int:
+    """
+    Find the minimum in a recursive structure of lists
+    within other lists.
+    Precondition: No lists or sublists are emtpy.
+    """
+    smallest = None
+    first_time = True
+    for element in nested_list:
+        if type(element) is list:
+            value = recursive_min(element)
+        else:
+            value = element
+        if first_time or value < smallest:
+            smallest = value
+            first_time = False
+    return smallest
+
+
+def count(nested_list: list, target: int) -> int:
+    """Returns the total appearances of a target in nested_number_list"""
+    total = 0
+    for element in nested_list:
+        if type(element) is list:
+            total += count(element, target)
+        elif element == target:
+            total += 1
+    return total
+
+
+def flatten(nested_list: list) -> list:
+    new_list = []
+    for element in nested_list:
+        if type(element) is list:
+            new_list += flatten(element)
+        else:
+            new_list.append(element)
+    return new_list
+
+
+def fibonacci_no_recursion(n: int) -> int:
+    list_of_start = [0, 1, 1]
+    a, b = list_of_start[1], list_of_start[2]
+    loops = 2
+    if n < 3:
+        return list_of_start[n]
+    else:
+        while loops < n:
+            temp = b
+            b = a + b
+            a = temp
+            loops += 1
+    return b
+
+
+# TODO 9, 10, 11 s172 i how to think om jeg gidder.
+
 abra.speed(30)
 # sierpinski(abra, 1, 500)
 # abra.forward(500 / 3)
@@ -159,8 +216,12 @@ abra.speed(30)
 # sierpinski(abra, 4, 500)
 # abra.forward(500 * 8 / 54)
 # sierpinski(abra, 5, 500)
-color_sierpinski(abra, 5, 3000, 5, 0)
+# color_sierpinski(abra, 5, 3000, 5, 0)
 # next_color(abra)
+# print(recursive_min([[2, 3, 7], [1, 2], -7, [-1, -4, -7]]))
+# print(flatten([[2, 3, 7], [1, 2], -7, [-1, -4, -7]]))
+# print(count([[2, 3, 7], [1, 2], -7, [-1, -4, -7], -1], -1))
+# print(fibonacci_no_recursion(200))
+limit = sys.getrecursionlimit()
+print(limit)
 window.mainloop()
-
-def recursive_min(nested_number_list)
