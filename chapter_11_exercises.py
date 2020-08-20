@@ -4,6 +4,18 @@ class Point:
         self.x = x
         self.y = y
 
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+
+    def __mul__(self, other):
+        return self.x * other.x + self.y * other.y
+
+    def __rmul__(self, other):
+        return Point(other * self.x, other * self.y)
+
+    def get_self_coordinates(self):
+        return self.x, self.y
+
     def distance_from_point_to_point(self, target):
         return ((target.x - self.x) ** 2 + (target.y - self.y) ** 2) ** 0.5
 
@@ -135,15 +147,186 @@ class Rectangle:
         return False
 
     def collides_with(self, rectangle):
-        pass
+        rectangle_is_inside_self_height = self.corner.y <= rectangle.corner.y <= self.corner.y + self.height
+        self_inside_rectangle_height = rectangle.corner.y <= self.corner.y <= rectangle.corner.y + rectangle.height
+        rectangle_is_inside_self_width = self.corner.x <= rectangle.corner.x <= self.corner.x + self.width
+        self_inside_rectangle_width = rectangle.corner.x <= self.corner.x <= rectangle.corner.x + rectangle.width
+
+        print("Is rectangle corner {} inside self {} height {} : {}"
+              .format(rectangle.corner.get_self_coordinates(), self.corner.get_self_coordinates()
+                      , self.height, rectangle_is_inside_self_height))
+        print("Is self corner {} inside rectangle {} height {} : {}"
+              .format(self.corner.get_self_coordinates(), rectangle.corner.get_self_coordinates()
+                      , rectangle.height, self_inside_rectangle_height))
+        print("Is rectangle corner {} inside self {} width {} : {}"
+              .format(rectangle.corner.get_self_coordinates(), self.corner.get_self_coordinates(),
+                      self.width, rectangle_is_inside_self_width))
+        print("Is self corner {} inside rectangle {} width {} : {}"
+              .format(self.corner.get_self_coordinates(), rectangle.corner.get_self_coordinates(),
+                      rectangle.width, self_inside_rectangle_width))
+
+        if rectangle_is_inside_self_width and rectangle_is_inside_self_height:
+            return True
+        elif self_inside_rectangle_width and self_inside_rectangle_height:
+            return True
+        return False
 
 
-r = Rectangle(Point(3, 0), 10, 5)
-print(r.contains(Point(0, 0)))
-print(r.contains(Point(3, 3)))
-print(r.contains(Point(3, 7)))
-print(r.contains(Point(3, 5)))
-print(r.contains(Point(3, 4.9999)))
-print(r.contains(Point(-3, -3)))
+r1 = Rectangle(Point(0, 0), 2, 2)
+r2 = Rectangle(Point(1, 0), 2, 5)
+r3 = Rectangle(Point(2, 3), 1, 1)
+r4 = Rectangle(Point(0, 2), 2, 2)
 
 
+class MyTime:
+
+    def __init__(self, hrs=0, mins=0, secs=0):
+
+        totalsecs = hrs * 3600 + mins * 60 + secs
+        self.hours = totalsecs // 3600
+        leftoversecs = totalsecs % 3600
+        self.minutes = leftoversecs // 60
+        self.seconds = leftoversecs % 60
+
+    def __add__(self, other):
+        return MyTime(0, 0, self.to_seconds() + other.to_seconds())
+
+    def __str__(self):
+        return "Hours: {}, Minutes: {}, Seconds: {}".format(self.hours, self.minutes, self.seconds)
+
+    def __gt__(self, other):
+        return self.to_seconds() > other.to_seconds()
+
+    def increment(self, seconds):
+        totalsecs = self.to_seconds() + seconds
+        # if totalsecs < 0:
+        #     self.hours = 0
+        #     self.hours = 0
+        #     self.hours = 0
+        # elif totalsecs >= 0:
+        self.hours = totalsecs // 3600
+        leftoversecs = totalsecs % 3600
+        self.minutes = leftoversecs // 60
+        self.seconds = leftoversecs % 60
+
+    def to_seconds(self):
+        return self.hours * 3600 + self.minutes * 60 + self.seconds
+
+    def after(self, time2):
+        return self.to_seconds() > time2.to_seconds()
+
+    def between(self, t1, t2):
+        if t1.to_seconds() <= self.to_seconds() < t2.to_seconds():
+            return True
+        elif t2.to_seconds() <= self.to_seconds() < t1.to_seconds():
+            return True
+        return False
+
+
+time1 = MyTime(0, 0, 600)
+time2 = MyTime(0, 0, 500)
+time3 = MyTime(0, 0, 400)
+
+print(time3)
+time3.increment(300)
+print(time3)
+
+
+def add_time(t1, t2):
+    secs = t1.to_seconds() + t2.to_seconds()
+    return MyTime(0, 0, secs)
+
+
+def multadd(x, y, z):
+    return x * y + z
+
+
+def front_and_back(front):
+    import copy
+    back = copy.copy(front)
+    back.reverse()
+    print(str(front) + str(back))
+
+
+class Card:
+    suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
+    ranks = ["narfs", "2", "3", "4", "5", "6", "7",
+             "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+
+    def __init__(self, suit=0, rank=0):
+        self.suit = suit
+        self.rank = rank
+
+    def __str__(self):
+        return self.ranks[self.rank] + " of " + self.suits[self.suit]
+
+    def __eq__(self, other):
+        return self.cmp(other) == 0
+
+    def __le__(self, other):
+        return self.cmp(other) <= 0
+
+    def __ge__(self, other):
+        return self.cmp(other) >= 0
+
+    def __gt__(self, other):
+        return self.cmp(other) > 0
+
+    def __lt__(self, other):
+        return self.cmp(other) < 0
+
+    def __ne__(self, other):
+        return self.cmp(other) != 0
+
+    def cmp(self, other):
+        if self.suit > other.suit: return 1
+        if self.suit < other.suit: return -1
+        if self.rank > other.rank: return 1
+        if self.rank < other.rank: return -1
+        return 0
+
+
+class Deck:
+
+    def __init__(self):
+        self.cards = []
+        for suit in range(4):
+            for rank in range(1, 14):
+                self.cards.append(Card(suit, rank))
+
+    def __str__(self):
+        s = ""
+        for i in range(len(self.cards)):
+            s = s + " " * i + str(self.cards[i]) + "\n"
+        return s
+
+    def print_deck(self):
+        for card in self.cards:
+            print(card)
+
+    def shuffle(self):
+        import random
+        rng = random.Random()
+        # num_cards = len(self.cards)
+        # for i in range(num_cards):
+        #     j = rng.randrange(i, num_cards)
+        #     (self.cards[i], self.cards[j]) = (self.cards[j], self.cards[i])
+        rng.shuffle(self.cards)
+
+    def remove(self, card):
+        if card in self.cards:
+            self.cards.remove(card)
+            return True
+        else:
+            return False
+
+    def pop(self):
+        return self.cards.pop()
+
+    def is_empty(self):
+        return self.cards == []
+
+
+red_deck = Deck()
+blue_deck = Deck()
+print(red_deck)
