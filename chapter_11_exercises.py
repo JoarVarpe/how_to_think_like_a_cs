@@ -1,3 +1,7 @@
+import turtle
+import random
+
+
 class Point:
 
     def __init__(self, x=0, y=0):
@@ -300,6 +304,15 @@ class Deck:
             s = s + " " * i + str(self.cards[i]) + "\n"
         return s
 
+    def deal(self, hands, num_cards=999):
+        num_hands = len(hands)
+        for i in range(num_cards):
+            if self.is_empty():
+                break
+            card = self.pop()
+            hand = hands[i % num_hands]
+            hand.add(card)
+
     def print_deck(self):
         for card in self.cards:
             print(card)
@@ -327,6 +340,142 @@ class Deck:
         return self.cards == []
 
 
-red_deck = Deck()
-blue_deck = Deck()
-print(red_deck)
+class Hand(Deck):
+
+    def __init__(self, name=''):
+        self.cards = []
+        self.name = name
+
+    def __str__(self):
+        s = "Hand " + self.name
+        if self.is_empty():
+            s += " is empty\n"
+        else:
+            s += " contains\n"
+        return s + Deck.__str__(self)
+
+    def add(self, card):
+        self.cards.append(card)
+
+
+class CardGame:
+    def __init__(self):
+        self.deck = Deck()
+        self.deck.shuffle()
+
+
+class OldMaidHand(Hand):
+    def remove_matches(self):
+        count = 0
+        original_cards = self.cards[:]
+        for card in original_cards:
+            match = Card(3 - card.suit, card.rank)
+            if match in self.cards:
+                self.cards.remove(card)
+                self.cards.remove(match)
+                print("Hand {}: {} matches {}".format(
+                    self.name, card, match
+                ))
+                count += 1
+        print()
+        return count
+
+
+class OldMaidGame(CardGame):
+    def play(self, names):
+        # Remove queen of clubs
+        self.deck.remove(Card(0, 12))
+
+        # Make a hand for each player
+        self.hands = []
+        for name in names:
+            self.hands.append(OldMaidHand(name))
+
+        # Deal the cards
+        self.deck.deal(self.hands)
+        print("----------- Cards have been dealt")
+        self.print_hands()
+
+        # Remove initial matches
+        matches = self.remove_all_matches()
+        print("--------------- Matches discarded, play begins")
+        self.print_hands()
+
+        # Play until all 50 cards are matched
+        turn = 0
+        num_hands = len(self.hands)
+        while matches < 25:
+            matches += self.play_one_turn(turn)
+            turn = (turn + 1) % num_hands
+
+        print("------------ Game is Over")
+        self.print_hands()
+
+    def print_hands(self):
+        print("Printing hands ----------------")
+        for i in self.hands:
+            print(i)
+
+    def remove_all_matches(self):
+        count = 0
+        for hand in self.hands:
+            count += hand.remove_matches()
+        return count
+
+    def play_one_turn(self, i):
+        if self.hands[i].is_empty():
+            return 0
+        neighbor = self.find_neighbor(i)
+        picked_card = self.hands[neighbor].pop()
+        self.hands[i].add(picked_card)
+        print("Hand", self.hands[i].name, "picked", picked_card)
+        count = self.hands[i].remove_matches()
+        self.hands[i].shuffle()
+        return count
+
+    def find_neighbor(self, i):
+        num_hands = len(self.hands)
+        for next in range(1, num_hands):
+            neighbor = (i + next) % num_hands
+            if not self.hands[neighbor].is_empty():
+                return neighbor
+
+
+# red_deck = Deck()
+# blue_deck = Deck()
+# print(red_deck)
+
+# game = OldMaidGame()
+# game.play(["Abu", "Dick", "Chris"])
+
+class TurtleGTX(turtle.Turtle):
+    def __init__(self):
+        super().__init__()
+        self._odometer = 0
+        self._last_tyreshift = 0
+        self._tyreshift = random.random() * 400
+        self._can_move = True
+
+    def jump(self, distance):
+        self.penup()
+        self.forward(distance)
+        self.pendown()
+        self._odometer += abs(distance)
+
+    def forward(self, distance: float) -> None:
+        self.check_for_drive()
+        super().forward(distance)
+        self._odometer += abs(distance)
+        self.check_for_tires()
+
+    def check_for_tires(self):
+        if self._odometer - self._last_tyreshift >= self._tyreshift:
+            self._can_move = False
+
+    def check_for_drive(self):
+        if not self._can_move:
+            raise Exception("-----FLAT TIRE, CAN'T MOVE!-----")
+
+    def change_tyre(self):
+        self._can_move = True
+        self._last_tyreshift = self._odometer
